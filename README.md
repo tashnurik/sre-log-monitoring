@@ -152,7 +152,7 @@ The dashboard shows:
 **Result:** Operations team can monitor all services in real-time from a single URL without switching between screens.
 
 ![CloudWatch Dashboard — Alarms Triggered](screenshots/alarm.png)
-![CloudWatch Dashboard — Alarms Triggered](screenshots/Dashboard.png)
+![CloudWatch Dashboard — RealTme Monitoring](screenshots/Dashboard.png)
 
 ---
 
