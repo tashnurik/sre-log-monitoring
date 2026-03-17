@@ -152,7 +152,7 @@ The dashboard shows:
 **Result:** Operations team can monitor all services in real-time from a single URL without switching between screens.
 
 ![CloudWatch Dashboard — Alarms Triggered](screenshots/alarm.png)
-![CloudWatch Dashboard — RealTme Monitoring](screenshots/Dashboard.png)
+![Cloudwatch Dashboard — RealTme Monitoring](screenshots/Dashboard.png)
 
 ---
 
@@ -178,7 +178,7 @@ cd scripts
 
 ![Simulation Script Code](screenshots/simulation_script.png)
 
-![Simulation Running](screenshots/Result.png)
+![Running](screenshots/Result.png)
 
 ### Step 3 — Wait 2 minutes then check:
 - CloudWatch Dashboard → alarms turn red
