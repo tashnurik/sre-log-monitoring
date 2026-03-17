@@ -12,3 +12,8 @@ output "alarm_names" {
   description = "CloudWatch Alarm names for each service"
   value       = [for k, v in aws_cloudwatch_metric_alarm.error_alarm : v.alarm_name]
 }
+
+output "dashboard_url" {
+  description = "CloudWatch Dashboard URL"
+  value       = "https://${var.aws_region}.console.aws.amazon.com/cloudwatch/home?region=${var.aws_region}#dashboards:name=${aws_cloudwatch_dashboard.main.dashboard_name}"
+}

@@ -64,3 +64,96 @@ resource "aws_sns_topic_subscription" "email" {
   protocol  = "email"
   endpoint  = var.email_alert
 }
+
+
+
+resource "aws_cloudwatch_dashboard" "main" {
+  dashboard_name = "CardioOne-Log-Monitoring"
+
+  dashboard_body = jsonencode({
+    widgets = [
+      {
+        type   = "alarm"
+        x      = 0
+        y      = 0
+        width  = 24
+        height = 3
+        properties = {
+          title  = "Service Alarms Overview"
+          alarms = [
+            "arn:aws:cloudwatch:${var.aws_region}:${data.aws_caller_identity.current.account_id}:alarm:HighErrorRate-app-service",
+            "arn:aws:cloudwatch:${var.aws_region}:${data.aws_caller_identity.current.account_id}:alarm:HighErrorRate-auth-service",
+            "arn:aws:cloudwatch:${var.aws_region}:${data.aws_caller_identity.current.account_id}:alarm:HighErrorRate-api-service"
+          ]
+        }
+      },
+      {
+        type   = "metric"
+        x      = 0
+        y      = 3
+        width  = 8
+        height = 6
+        properties = {
+          title   = "Error Count - App Service"
+          region  = var.aws_region
+          metrics = [["CardioOne/LogMetrics", "ErrorCount-app-service"]]
+          period  = 300
+          stat    = "Sum"
+          view    = "timeSeries"
+          annotations = {
+            horizontal = [{
+              value = var.error_threshold
+              label = "Threshold"
+              color = "#ff0000"
+            }]
+          }
+        }
+      },
+      {
+        type   = "metric"
+        x      = 8
+        y      = 3
+        width  = 8
+        height = 6
+        properties = {
+          title   = "Error Count - Auth Service"
+          region  = var.aws_region
+          metrics = [["CardioOne/LogMetrics", "ErrorCount-auth-service"]]
+          period  = 300
+          stat    = "Sum"
+          view    = "timeSeries"
+          annotations = {
+            horizontal = [{
+              value = var.error_threshold
+              label = "Threshold"
+              color = "#ff0000"
+            }]
+          }
+        }
+      },
+      {
+        type   = "metric"
+        x      = 16
+        y      = 3
+        width  = 8
+        height = 6
+        properties = {
+          title   = "Error Count - API Service"
+          region  = var.aws_region
+          metrics = [["CardioOne/LogMetrics", "ErrorCount-api-service"]]
+          period  = 300
+          stat    = "Sum"
+          view    = "timeSeries"
+          annotations = {
+            horizontal = [{
+              value = var.error_threshold
+              label = "Threshold"
+              color = "#ff0000"
+            }]
+          }
+        }
+      }
+    ]
+  })
+} 
+data "aws_caller_identity" "current" {}
