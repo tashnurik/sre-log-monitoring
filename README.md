@@ -176,6 +176,8 @@ cd scripts
 [app-service] CRITICAL: Service is unresponsive
 ```
 
+![Simulation Script Code](screenshots/simulation_script.png)
+
 ![Simulation Running](screenshots/Result.png)
 
 ### Step 3 — Wait 2 minutes then check:
