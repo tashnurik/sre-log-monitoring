@@ -1,19 +1,7 @@
-# Log Monitoring & Alerting System
-
-## Overview
-This is a log monitoring and alerting system for production environment. 
-What it does:
-- Continiously collects logs from multiple services
-- Analyzes them in near realtime
-- Alerts the operations team when critical issues are detected.
+# CardioOne Log Monitoring & Alerting System
 
 ## Problem Statement
-Production services generate logs locally on each server and are reviewed only after incidents occur. 
-I am going to centralize logs, it detects errors automatically, and alerting the team before issues escalate.
-
-I am responsible for improving the reliability of a production system that runs multiple services across several servers. 
-Each service generates application and system logs that include informational messages, warnings, and error events. 
-Currently, these logs are stored locally on each server and are reviewed only after incidents occur.
+I am responsible for improving the reliability of a production system that runs multiple services across several servers. Each service generates application and system logs that include informational messages, warnings, and error events. Currently, these logs are stored locally on each server and are reviewed only after incidents occur.
 
 Design a log monitoring and alert system that continuously collects logs, analyzes them in near real-time, and alerts the operations team when critical issues are detected.
 
@@ -38,17 +26,24 @@ The system:
 ---
 
 ## Architecture
+```
 Multiple Services → CloudWatch Log Groups → Metric Filters → CloudWatch Alarms → SNS → Email Alert
+                                                                    ↓
+                                                        CloudWatch Dashboard
+```
 
+---
 
 ## Tech Stack
-- **Terraform** — provisions all AWS resources with a single command
+- **Terraform** — Infrastructure as Code, provisions all AWS resources with a single command
 - **AWS CloudWatch Log Groups** — Centralized log collection from multiple services
 - **AWS CloudWatch Metric Filters** — Detects ERROR, CRITICAL, Exception patterns in real-time
 - **AWS CloudWatch Alarms** — Triggers when error rate exceeds configurable threshold
 - **AWS CloudWatch Dashboard** — Visual real-time monitoring of all services
 - **AWS SNS** — Delivers email alerts to the operations team
 - **Bash** — Log simulator script to test and demonstrate the system
+
+---
 
 ## Repository Structure
 ```
@@ -72,14 +67,17 @@ cardioone-log-monitoring/
 ### Step 1 — Infrastructure Provisioned with Terraform
 All AWS resources are created with a single command using Terraform.
 No manual clicking in AWS console — everything is reproducible and version controlled.
+
 **Result:** 11 AWS resources created in under 30 seconds.
 
-![Terraform Apply](screenshots/apply.png)
+![Terraform Validate and Plan](screenshots/plan1.png)
+
+![Terraform Apply — All Resources Created](screenshots/apply.png)
 
 ---
 
 ### Step 2 — CloudWatch Log Groups Created
-Three log groups created — one per service — to collect and centralize logs from multiple services and servers.
+Three log groups created — one per service — to collect and centralize logs from multiple services and servers:
 - `/cardioone/app-service`
 - `/cardioone/auth-service`
 - `/cardioone/api-service`
@@ -93,12 +91,14 @@ Three log groups created — one per service — to collect and centralize logs 
 ### Step 3 — Error Pattern Detection
 CloudWatch Metric Filters watch every log line in real-time and count occurrences of:
 - `ERROR` — application errors
-- `CRITICAL` — critical failures  
+- `CRITICAL` — critical failures
 - `Exception` — code exceptions
+
+INFO and WARNING logs are completely ignored.
 
 **Result:** Every error event is automatically detected and counted — no manual log review needed.
 
-![Log Events](screenshots/LogEvents.png)
+![Log Events — INFO and ERROR messages](screenshots/LogEvents.png)
 
 ---
 
@@ -106,14 +106,14 @@ CloudWatch Metric Filters watch every log line in real-time and count occurrence
 CloudWatch Alarms fire when error count exceeds **5 errors in 5 minutes** — a configurable threshold.
 All 3 services are monitored independently with their own alarms.
 
-**Result:** All 3 alarms triggered simultaneously when errors were detected — shown as "In alarm" state.
+**Result:** All 3 alarms triggered simultaneously when errors were detected.
 
-![CloudWatch Alarms](screenshots/alarm.png)
+![CloudWatch Alarms — In Alarm State](screenshots/alarm.png)
 
 ---
 
 ### Step 5 — Email Alerts Delivered
-When alarms fire, SNS immediately delivers email notifications to the operations team with full alarm details including:
+When alarms fire, SNS immediately delivers email notifications to the operations team with full details:
 - Which service triggered the alarm
 - Exact threshold that was crossed
 - Timestamp of the event
@@ -121,7 +121,7 @@ When alarms fire, SNS immediately delivers email notifications to the operations
 
 **Result:** Operations team received 3 email alerts within 2 minutes of errors occurring.
 
-![Alert Emails](screenshots/email1.png)
+![Alert Emails — All 3 Services](screenshots/email1.png)
 
 ![Alert Email Detail — API Service](screenshots/email2.png)
 
@@ -133,7 +133,8 @@ When alarms fire, SNS immediately delivers email notifications to the operations
 
 ### Step 6 — Minimizing False Positives
 Three mechanisms prevent unnecessary alerts:
-1. **Threshold of 5 errors** — single errors don't trigger alarms, only sustained error rates do
+
+1. **Threshold of 5 errors** — a single error does not trigger an alarm, only sustained error rates do
 2. **`treat_missing_data = notBreaching`** — if a service goes quiet or restarts, no false alarm fires
 3. **Specific keyword patterns** — only ERROR, CRITICAL, Exception trigger counting. INFO and WARNING logs are completely ignored
 
@@ -141,7 +142,7 @@ Three mechanisms prevent unnecessary alerts:
 
 ---
 
-### Step 7 — Real-Time Dashboard (Anything else we can think of)
+### Step 7 — Real-Time Dashboard *(Anything else we can think of)*
 A CloudWatch Dashboard was built to give the operations team a single-pane-of-glass view of all services.
 
 The dashboard shows:
@@ -151,36 +152,25 @@ The dashboard shows:
 
 **Result:** Operations team can monitor all services in real-time from a single URL without switching between screens.
 
-![CloudWatch Dashboard — Alarms Triggered](screenshots/alarm.png)
-![Cloudwatch Dashboard — RealTme Monitoring](screenshots/Dashboard.png)
+![CloudWatch Dashboard — Alarms In Alarm State](screenshots/Dashboard.png)
 
 ---
 
-
-
 ## Live Demo — How to Trigger Alerts
 
-### Step 1 — Run the log simulator:
+### Step 1 — Run the log simulator
 ```bash
 cd scripts
 ./simulate_logs.sh
 ```
 
-### Step 2 — Watch the simulator output:
-```
-📝 Sending normal logs...
-[app-service] INFO: Service started successfully
-[app-service] INFO: Health check passed
-⚠️  Sending ERROR logs to trigger alarms...
-[app-service] ERROR: Database connection failed
-[app-service] CRITICAL: Service is unresponsive
-```
+### Step 2 — Watch the simulator send logs to CloudWatch
 
 ![Simulation Script Code](screenshots/simulation_script.png)
 
-![Running](screenshots/Result.png)
+![Simulation Running — Logs Being Sent](screenshots/Result.png)
 
-### Step 3 — Wait 2 minutes then check:
+### Step 3 — Wait 2 minutes then check
 - CloudWatch Dashboard → alarms turn red
 - Email inbox → 3 alert emails arrive
 
@@ -203,22 +193,22 @@ terraform plan
 terraform apply
 ```
 
-### Destroy
+### Destroy all resources
 ```bash
 terraform destroy
 ```
-> One command tears down all 11 resources cleanly — no orphaned infrastructure left behind.
+> One command tears down all 11 resources cleanly — no orphaned infrastructure left behind. This is one of the key benefits of Infrastructure as Code.
 
 ---
 
 ## In Production
-In a real production environment, this system would be extended with:
+In a real production environment this system would be extended with:
 - **CloudWatch Agent** installed on each ECS task/server to automatically ship real application logs
 - **Slack notifications** via SNS → Lambda → Slack webhook
 - **PagerDuty integration** for on-call escalation
-- **Log Insights queries** for deeper log analysis
+- **Log Insights queries** for deeper log analysis and root cause investigation
 
 ---
 
 ## Author
-Nurtilek — Site Reliability Engineer
+Nurtilek Tashbekov — Site Reliability Engineer Candidate
