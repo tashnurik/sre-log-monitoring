@@ -1,4 +1,4 @@
-# CardioOne Log Monitoring & Alerting System
+# SRE Log Monitoring & Alerting System
 
 ## Problem Statement
 I am responsible for improving the reliability of a production system that runs multiple services across several servers. Each service generates application and system logs that include informational messages, warnings, and error events. Currently, these logs are stored locally on each server and are reviewed only after incidents occur.
