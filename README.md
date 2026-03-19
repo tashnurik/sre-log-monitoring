@@ -10,7 +10,7 @@ The system should be able to:
 - Detect predefined error patterns (e.g., ERROR, CRITICAL, repeated exceptions)
 - Trigger alerts when error rates exceed configurable thresholds
 - Minimize false positives while ensuring timely alerts
-- Anything else you can think of
+
 
 ---
 
